@@ -5,6 +5,7 @@ require "src/Player"
 require "src/Ground"
 require "src/Wall"
 require "src/Brick"
+require "src/SpeedUpGem"
 
 
 require 'lib/StateMachine'
@@ -57,6 +58,14 @@ function love.resize(w, h)
   push:resize(w, h)
 end
 
+function love.keypressed(key, scancode, isrepeat)
+  if key == "escape" then
+    love.event.quit()
+  else
+    inputTable[key] = true
+  end
+end
+
 function collide(hitbox1, hitbox2)
   if hitbox1.x + hitbox1.width <= hitbox2.x or hitbox1.x >= hitbox2.x + hitbox2.width then
     return false
@@ -67,14 +76,16 @@ function collide(hitbox1, hitbox2)
   return true
 end
 
-function love.keypressed(key, scancode, isrepeat)
-  if key == "escape" then
-    love.event.quit()
-  else
-    inputTable[key] = true
-  end
-end
-
 function keypressed(key)
   return inputTable[key]
+end
+
+function sign(num)
+  if num > 0 then
+    return 1
+  elseif num == 0 then
+    return 0
+  else
+    return -1
+  end
 end
