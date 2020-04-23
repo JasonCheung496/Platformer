@@ -1,15 +1,15 @@
-push = require "push"
-Class = require "class"
+push = require "lib/push"
+Class = require "lib/class"
 
-require "Player"
-require "Ground"
-require "Wall"
-require "Brick"
+require "src/Player"
+require "src/Ground"
+require "src/Wall"
+require "src/Brick"
 
 
-require 'StateMachine'
-require 'states/BaseState'
-require 'states/PlayState'
+require 'lib/StateMachine'
+require 'src/states/BaseState'
+require 'src/states/PlayState'
 
 
 GAME_WIDTH, GAME_HEIGHT = 1600, 900

@@ -3,7 +3,7 @@ Player = Class{}
 Player.speed = 400
 Player.friction = 100
 
-local img = love.graphics.newImage('particle.png')
+local img = love.graphics.newImage('Sprites/particle.png')
 local font = love.graphics.newFont(40)
 
 chargeBufferTime = 0.3
