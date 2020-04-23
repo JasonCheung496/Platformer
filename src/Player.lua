@@ -1,14 +1,19 @@
 Player = Class{}
 
-Player.speed = 400
-Player.friction = 100
 
 local img = love.graphics.newImage('Sprites/particle.png')
 local font = love.graphics.newFont(40)
 
-chargeBufferTime = 0.3
-chargingTime = 0.3
-gravity = 50
+
+chargeBufferTime = 0.2
+chargingTime = 0.15
+particleEmissionTime = 0.04
+speedUpGemBufferTime = 0.4
+
+chargeFactor = 5
+friction = 100
+gravity = 0--75
+moveSpeed = 400
 
 function Player:init()
   self.x = 0
@@ -28,12 +33,12 @@ function Player:init()
   }
 
   psystem = love.graphics.newParticleSystem(img, 1000)
-  psystem:setParticleLifetime(1)
+  psystem:setParticleLifetime(0.7)
   psystem:setEmissionRate(20)
   psystem:setSizeVariation(1)
   psystem:setPosition(self.x + self.width/2, self.y + self.height/2)
   psystem:setDirection(math.pi)
-  psystem:setSpeed(100)
+  psystem:setSpeed(200)
   psystem:setSpread(math.pi/2)
   --psystem:setTangentialAcceleration(10)
   --psystem:setLinearAcceleration(-10, -10, 10, 10)
@@ -41,23 +46,39 @@ function Player:init()
 
   chargeBufferTimer = 0
   chargingTimer = 0
+  particleEmissionTimer = 0
+  speedUpGemBufferTimer = 0
 
 end
 
 function Player:update(dt)
+  --auto stop the player if no control
+  if self.dx < 0 then
+    self.dx = math.min(self.dx + friction, 0)
+  end
+  if self.dx > 0 then
+    self.dx = math.max(self.dx - friction, 0)
+  end
+  if self.dy < 0 then
+    self.dy = math.min(self.dy + friction, 0)
+  end
+  if self.dy > 0 then
+    self.dy = math.max(self.dy - friction, 0)
+  end
+
   --Pressing a direction will decelerate if player moves in opposite direction and
   --keep constant speed and won't decelerate in the same direction
   if love.keyboard.isDown("up") then
-    self.dy = math.min(math.max(self.dy-Player.speed, -Player.speed), self.dy)
+    self.dy = math.min(math.max(self.dy-moveSpeed, -moveSpeed), self.dy)
   end
   if love.keyboard.isDown("down") then
-    self.dy = math.max(math.min(self.dy+Player.speed, Player.speed), self.dy)
+    self.dy = math.max(math.min(self.dy+moveSpeed, moveSpeed), self.dy)
   end
   if love.keyboard.isDown("left") then
-    self.dx = math.min(math.max(self.dx-Player.speed, -Player.speed), self.dx)
+    self.dx = math.min(math.max(self.dx-moveSpeed, -moveSpeed), self.dx)
   end
   if love.keyboard.isDown("right") then
-    self.dx = math.max(math.min(self.dx+Player.speed, Player.speed), self.dx)
+    self.dx = math.max(math.min(self.dx+moveSpeed, moveSpeed), self.dx)
   end
 
   self.dy = self.dy + gravity
@@ -65,10 +86,10 @@ function Player:update(dt)
   --charge
   if love.keyboard.isDown("w") and chargeBufferTimer <= 0 then
     chargingTimer = math.min(chargingTimer + dt, chargingTime)
+    self.dx, self.dy = self.dx*0.8, self.dy*0.8
   elseif not love.keyboard.isDown("w") then
     if chargingTimer >= chargingTime then
-      self.dy = self.dy*6
-      self.dx = self.dx*6
+      self.dx, self.dy = self.dx*chargeFactor, self.dy*chargeFactor
       chargeBufferTimer = chargeBufferTime
     end
     chargingTimer = 0
@@ -97,28 +118,27 @@ function Player:update(dt)
     end
   end
 
-
-
-
-  if self.dx < 0 then
-    self.dx = math.min(self.dx + Player.friction, 0)
+  --speedUpGem eddect
+  if collide(self.hitbox, speedUpGem.hitbox) then
+    speedUpGemBufferTimer = speedUpGemBufferTime
   end
-  if self.dx > 0 then
-    self.dx = math.max(self.dx - Player.friction, 0)
+  if speedUpGemBufferTimer > 0 and keypressed("w") then
+    speedUpGem:effect(self)
+  end
+  speedUpGemBufferTimer = math.max(speedUpGemBufferTimer - dt, 0)
+
+  --update particle system
+  if particleEmissionTimer >= particleEmissionTime then
+    psystem:start()
+    particleEmissionTimer = 0
+  else
+    psystem:pause( )
+    particleEmissionTimer = particleEmissionTimer + dt
   end
 
-  --[[if self.dy < 0 then
-    self.dy = math.min(self.dy + Player.friction, 0)
-  end
-  if self.dy > 0 then
-    self.dy = math.max(self.dy - Player.friction, 0)
-  end]]--
-
-
-  psystem:setDirection(math.atan(sign(self.dy)/sign(self.dx)))
+  psystem:setDirection(math.atan(sign(self.dy)/sign(self.dx)) + (self.dx<0 and 0 or math.pi))--correct angle
   psystem:setPosition(self.x + self.width/2, self.y + self.height/2)
-  psystem:setEmissionRate(math.max(math.abs(self.dx)*dt*20, math.abs(self.dy)*dt*20))
-
+  psystem:setEmissionRate(math.max(math.abs(self.dx)*dt*100, math.abs(self.dy)*dt*100))
   psystem:update(dt)
 
 end
@@ -135,21 +155,11 @@ function Player:render()
   end
 
   love.graphics.setFont(font)
-  love.graphics.print(tostring(math.floor(2.9) + 1.5 - math.floor(1.5)), 0, 0)
+  love.graphics.print(tostring(self.__index == Player), 0, 0)
   love.graphics.print(tostring(chargingTimer), 0, 100)
   love.graphics.print(string.format("x=%f, y=%f, dx=%f, dy=%f", self.x, self.y, self.dx, self.dy), 0, 200)
   love.graphics.print(string.format("hitbox.x=%f,   hitbox.y=%f", self.hitbox.x, self.hitbox.y), 0, 300)
 
-end
-
-function sign(num)
-  if num > 0 then
-    return 1
-  elseif num == 0 then
-    return 0
-  else
-    return -1
-  end
 end
 
 function Player:updateHitbox()

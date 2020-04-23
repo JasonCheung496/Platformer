@@ -4,7 +4,7 @@ function Wall:init()
   self.width = 100
   self.height = GAME_HEIGHT
 
-  self.x = GAME_WIDTH-self.width
+  self.x = GAME_WIDTH+2000
   self.y = 0
 
   self.hitbox = {

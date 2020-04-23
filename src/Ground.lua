@@ -1,7 +1,7 @@
 Ground = Class{}
 
 function Ground:init()
-  self.width = GAME_WIDTH
+  self.width = 3000
   self.height = 100
 
   self.x = 0
