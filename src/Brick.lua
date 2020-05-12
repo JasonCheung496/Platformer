@@ -1,11 +1,11 @@
-Brick = Class{}
+BrickTile = Class{}
 
-function Brick:init()
-  self.width = 100
-  self.height = 100
+function BrickTile:init(x, y, width, height)
+  self.width = width
+  self.height = height
 
-  self.x = 200.5
-  self.y = 200.5
+  self.x = x
+  self.y = y
 
   self.hitbox = {
     x = self.x,
@@ -13,14 +13,15 @@ function Brick:init()
     width = self.width,
     height = self.height
   }
+  
 
 end
 
-function Brick:update(dt)
+function BrickTile:update(dt)
 
 end
 
-function Brick:render()
+function BrickTile:render()
   love.graphics.setColor(0.9, 0.1, 0.6, 1)
   love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 end

@@ -6,7 +6,7 @@ require "src/Ground"
 require "src/Wall"
 require "src/Brick"
 require "src/SpeedUpGem"
-
+require "src/Tilemap"
 
 require 'lib/StateMachine'
 require 'src/states/BaseState'

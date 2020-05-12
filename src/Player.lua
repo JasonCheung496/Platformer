@@ -49,6 +49,8 @@ function Player:init()
   particleEmissionTimer = 0
   speedUpGemBufferTimer = 0
 
+  table.insert(entities, self)
+  table.insert(rigidBodies, self)
 end
 
 function Player:update(dt)

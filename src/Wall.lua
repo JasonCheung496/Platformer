@@ -14,6 +14,9 @@ function Wall:init()
     height = self.height
   }
 
+  table.insert(entities, self)
+  table.insert(rigidBodies, self)
+  
 end
 
 function Wall:update(dt)

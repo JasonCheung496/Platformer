@@ -19,6 +19,9 @@ function SpeedUpGem:init(x, y)
 
   self.cooldownTimer = 0
 
+  table.insert(entities, self)
+  table.insert(triggerBodies, self)
+
 end
 
 function SpeedUpGem:update(dt)

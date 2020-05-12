@@ -13,6 +13,8 @@ function Ground:init()
     width = self.width,
     height = self.height
   }
+  table.insert(entities, self)
+  table.insert(rigidBodies, self)
 
 end
 

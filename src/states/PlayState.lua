@@ -1,14 +1,21 @@
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
-  player = Player()
+  entities = {}
+  rigidBodies = {}
+  triggerBodies = {}
+
   ground = Ground()
   wall = Wall()
-  brick = Brick()
-  speedUpGem = SpeedUpGem(500, 700)
 
-  rigidBodies = {player, ground, wall, brick}
-  triggerBodies = {speedUpGem}
+  tilemap = Tilemap(200, 10)
+  for i = 1, 10 do
+    local newBrickTile = BrickTile(tilemap.x + (i-1)*tilemap.tilewidth, tilemap.y + tilemap.tileheight, tilemap.tilewidth, tilemap.tileheight)
+    tilemap[2][i] = newBrickTile
+  end
+
+  speedUpGem = SpeedUpGem(500, 700)
+  player = Player()
 
   screenScroll = {}
   screenScroll.x = 0
@@ -17,13 +24,9 @@ end
 
 function PlayState:update(dt)
 
-  wall:update(dt)
-  ground:update(dt)
-  brick:update(dt)
-
-  speedUpGem:update(dt)
-
-  player:update(dt)
+  for i, val in ipairs(entities) do
+    val:update(dt)
+  end
 
   screenScroll.x = math.floor(player.x > GAME_WIDTH/3 and -(player.x - GAME_WIDTH/3) or 0)
 end
@@ -31,12 +34,8 @@ end
 function PlayState:render()
   love.graphics.translate(screenScroll.x, screenScroll.y)
 
-  wall:render()
-  ground:render()
-  brick:render()
-
-  speedUpGem:render()
-
-  player:render()
+  for i, val in ipairs(entities) do
+    val:render()
+  end
 
 end
