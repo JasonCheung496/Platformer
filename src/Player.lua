@@ -120,7 +120,7 @@ function Player:update(dt)
     end
   end
 
-  --speedUpGem eddect
+  --speedUpGem effect
   if collide(self.hitbox, speedUpGem.hitbox) then
     speedUpGemBufferTimer = speedUpGemBufferTime
   end
